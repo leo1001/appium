@@ -59,13 +59,13 @@ Map<String, String> systemBars = driver.getSystemBars();
 
 |Language|Support|Documentation|
 |--------|-------|-------------|
-|[Java](https://github.com/appium/java-client/releases/latest)| All |  [appium.github.io](http://appium.github.io/java-client/io/appium/java_client/android/HasDeviceDetails.html#getSystemBars--)  |
+|[Java](https://github.com/appium/java-client/releases/latest)| All | [appium.github.io](https://appium.github.io/java-client/io/appium/java_client/android/HasAndroidDeviceDetails.html#getSystemBars--) |
 |[Python](https://github.com/appium/python-client/releases/latest)| None |  |
 |[Javascript (WebdriverIO)](http://webdriver.io/index.html)| None |  |
 |[Javascript (WD)](https://github.com/admc/wd/releases/latest)| None |  |
-|[Ruby](https://github.com/appium/ruby_lib/releases/latest)| All |  [www.rubydoc.info](http://www.rubydoc.info/github/appium/ruby_lib_core/Appium/Core/Device#get_system_bars-instance_method)  |
-|[PHP](https://github.com/appium/php-client/releases/latest)| None |  [github.com](https://github.com/appium/php-client/)  |
-|[C#](https://github.com/appium/appium-dotnet-driver/releases/latest)| None |  [github.com](https://github.com/appium/appium-dotnet-driver/)  |
+|[Ruby](https://github.com/appium/ruby_lib/releases/latest)| All | [www.rubydoc.info](https://www.rubydoc.info/github/appium/ruby_lib_core/Appium/Core/Device#get_system_bars-instance_method) |
+|[PHP](https://github.com/appium/php-client/releases/latest)| None | [github.com](https://github.com/appium/php-client/) |
+|[C#](https://github.com/appium/appium-dotnet-driver/releases/latest)| None | [github.com](https://github.com/appium/appium-dotnet-driver/) |
 
 ## HTTP API Specifications
 
@@ -89,4 +89,4 @@ Information about visibility and bounds of status and navigation bar (`array<obj
 
 ## See Also
 
-* [JSONWP Specification](https://github.com/appium/appium-base-driver/blob/master/lib/mjsonwp/routes.js#L418)
+* [JSONWP Specification](https://github.com/appium/appium-base-driver/blob/master/lib/protocol/routes.js#L491)

@@ -7,11 +7,11 @@ Perform a multi touch action sequence
 
 ```java
 // Java
-TouchAction actionOne = new TouchAction();
+TouchActions actionOne = new TouchAction();
 actionOne.press(10, 10);
 actionOne.moveTo(10, 100);
 actionOne.release();
-TouchAction actionTwo = new TouchAction();
+TouchActions actionTwo = new TouchAction();
 actionTwo.press(20, 20);
 actionTwo.moveTo(20, 200);
 actionTwo.release();
@@ -59,7 +59,7 @@ let action = new wd.MultiTouchAction();
 action.press({x: 10, y: 10});
 action.moveTo({x: 10, y: 100});
 action.release();
-await driver.performMultiTouchAction(action);
+await action.perform();
 
 ```
 
@@ -100,13 +100,13 @@ await driver.performMultiTouchAction(action);
 
 |Language|Support|Documentation|
 |--------|-------|-------------|
-|[Java](https://github.com/appium/java-client/releases/latest)| All |  [appium.github.io](http://appium.github.io/java-client/io/appium/java_client/MultiTouchAction.html)  |
-|[Python](https://github.com/appium/python-client/releases/latest)| All |  [github.com](https://github.com/appium/python-client/blob/master/appium/webdriver/common/multi_action.py)  |
-|[Javascript (WebdriverIO)](http://webdriver.io/index.html)| All |  [webdriver.io](http://webdriver.io/api/mobile/touchMultiPerform.html)  |
-|[Javascript (WD)](https://github.com/admc/wd/releases/latest)| All |  [github.com](https://github.com/admc/wd/blob/master/lib/commands.js#L1546)  |
-|[Ruby](https://github.com/appium/ruby_lib/releases/latest)| All |  [www.rubydoc.info](http://www.rubydoc.info/github/appium/ruby_lib/Appium/MultiTouch)  |
-|[PHP](https://github.com/appium/php-client/releases/latest)| All |  [github.com](https://github.com/appium/php-client/)  |
-|[C#](https://github.com/appium/appium-dotnet-driver/releases/latest)| All |  [github.com](https://github.com/appium/appium-dotnet-driver/)  |
+|[Java](https://github.com/appium/java-client/releases/latest)| All | [appium.github.io](https://appium.github.io/java-client/io/appium/java_client/MultiTouchAction.html) |
+|[Python](https://github.com/appium/python-client/releases/latest)| All | [github.com](https://github.com/appium/python-client/blob/master/appium/webdriver/common/multi_action.py) |
+|[Javascript (WebdriverIO)](http://webdriver.io/index.html)| All |  |
+|[Javascript (WD)](https://github.com/admc/wd/releases/latest)| All | [github.com](https://github.com/admc/wd/blob/master/lib/commands.js#L1546) |
+|[Ruby](https://github.com/appium/ruby_lib/releases/latest)| All | [www.rubydoc.info](https://www.rubydoc.info/github/appium/ruby_lib/Appium/MultiTouch) |
+|[PHP](https://github.com/appium/php-client/releases/latest)| All | [github.com](https://github.com/appium/php-client/) |
+|[C#](https://github.com/appium/appium-dotnet-driver/releases/latest)| All | [github.com](https://github.com/appium/appium-dotnet-driver/) |
 
 ## HTTP API Specifications
 
@@ -137,4 +137,4 @@ null
 
 ## See Also
 
-* [JSONWP Specification](https://github.com/appium/appium-base-driver/blob/master/lib/mjsonwp/routes.js#L295)
+* [JSONWP Specification](https://github.com/appium/appium-base-driver/blob/master/lib/protocol/routes.js#L324)

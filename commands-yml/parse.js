@@ -1,14 +1,15 @@
-/* eslint-disable no-console */
 import path from 'path';
 import yaml from 'yaml-js';
-import { fs, mkdirp } from 'appium-support';
+import { fs, mkdirp, util } from 'appium-support';
 import validate from 'validate.js';
 import Handlebars from 'handlebars';
 import replaceExt from 'replace-ext';
 import _ from 'lodash';
 import { asyncify } from 'asyncbox';
-import validator from './validator';
+import { validator, CLIENT_URL_TYPES } from './validator';
 import url from 'url';
+import log from 'fancy-log';
+import { exec } from 'teen_process';
 
 
 // What range of platforms do the driver's support
@@ -74,7 +75,7 @@ Handlebars.registerHelper('versions', (object, name, driverName) => {
 Handlebars.registerHelper('hyphenate', (str) =>  str.replace('_', '-'));
 Handlebars.registerHelper('uppercase', (str) => str.toUpperCase());
 
-Handlebars.registerHelper('capitalize', (driverName) => {
+Handlebars.registerHelper('capitalize', function (driverName) {
   switch (driverName.toLowerCase()) {
     case 'xcuitest':
       return 'XCUITest';
@@ -97,18 +98,90 @@ Handlebars.registerHelper('if_eq', function (a, b, opts) {
   }
 });
 
-Handlebars.registerHelper('base_url', function (fullUrl) {
+function getBaseHostname (fullUrl) {
   const baseUrl = url.parse(fullUrl);
   return baseUrl.hostname;
+}
+
+Handlebars.registerHelper('base_url', function (fullUrl) {
+  return getBaseHostname(fullUrl);
 });
 
+Handlebars.registerHelper('client_url', function (clientUrl) {
+  if (!clientUrl) {
+    return;
+  }
+
+  const createUrlString = function createUrlString (clientUrl, name = getBaseHostname(clientUrl)) {
+    return `[${name}](${clientUrl})`;
+  };
+
+  if (!_.isArray(clientUrl)) {
+    return createUrlString(clientUrl);
+  }
+
+  let urlStrings = [];
+  for (const item of clientUrl) {
+    for (let [key, value] of _.toPairs(item)) {
+      key = key.toLowerCase();
+      const urlStr = CLIENT_URL_TYPES[key] === 'hostname'
+        ? createUrlString(value)
+        : createUrlString(value, CLIENT_URL_TYPES[key]);
+      urlStrings.push(urlStr);
+    }
+  }
+  return urlStrings.join(' ');
+});
+
+async function registerSpecUrlHelper () {
+  const npmRoot = (await exec('npm', ['root'])).stdout.trim();
+  const routesFile = await fs.readFile(path.resolve(npmRoot, 'appium-base-driver', 'lib', 'protocol', 'routes.js'), 'utf8');
+  const routesFileLines = routesFile.split('\n');
+
+  Handlebars.registerHelper('spec_url', function (specUrl, endpoint) {
+    // return the url if it is not a link to our routes doc
+    if (!specUrl.includes('routes.js')) {
+      return specUrl;
+    }
+    // make sure it is a full url
+    if (specUrl.startsWith('routes.js')) {
+      specUrl = `https://github.com/appium/appium-base-driver/blob/master/lib/protocol/${specUrl}`;
+    }
+
+    // strip off any line numbers
+    specUrl = specUrl.split('#L')[0];
+
+    // the endpoint here is often `session_id` and we need `sessionId`
+    endpoint = endpoint.replace('session_id', 'sessionId');
+    // and `element_id` and we need `elementId`
+    endpoint = endpoint.replace('element_id', 'elementId');
+
+    // find the line number for this endpoint
+    let index;
+    for (const i in routesFileLines) {
+      if (routesFileLines[i].includes(endpoint)) {
+        // line numbers are 1-indexed
+        index = parseInt(i, 10) + 1;
+        break;
+      }
+    }
+    if (_.isUndefined(index)) {
+      throw new Error(`Unable to find entry in 'appium-base-driver#routes' for endpoint '${endpoint}'`);
+    }
+
+    return `${specUrl}#L${index}`;
+  });
+}
+
 async function generateCommands () {
+  await registerSpecUrlHelper();
+
   const commands = path.resolve(__dirname, 'commands/**/*.yml');
-  console.log('Traversing YML files', commands);
+  log('Traversing YML files', commands);
   await fs.rimraf(path.resolve(__dirname, '..', 'docs', 'en', 'commands'));
   let fileCount = 0;
   for (let filename of await fs.glob(commands)) {
-    console.log('Rendering file:', filename, path.relative(__dirname, filename), path.extname(filename));
+    log(`Rendering file: ${filename} ${path.relative(__dirname, filename)}`);
 
     // Translate the YML specs to JSON
     const inputYML = await fs.readFile(filename, 'utf8');
@@ -126,19 +199,16 @@ async function generateCommands () {
     // Write the markdown to its right place
     const markdownPath = replaceExt(path.relative(__dirname, filename), '.md');
     const outfile = path.resolve(__dirname, '..', 'docs', 'en', markdownPath);
-    console.log('Writing file to:', outfile);
+    log(`    Writing to: ${outfile}`);
     await mkdirp(path.dirname(outfile));
     await fs.writeFile(outfile, markdown, 'utf8');
 
     fileCount++;
   }
-  console.log(`Done writing ${fileCount} command documents`);
+  log(`Done writing ${fileCount} command documents`);
 }
 
 async function generateCommandIndex () {
-  const apiIndex = path.resolve(__dirname, '..', 'docs', 'en', 'about-appium', 'api.md');
-  console.log(`Creating API index '${apiIndex}'`);
-
   function getTree (element, path) {
     let node = {
       name: element[0],
@@ -146,6 +216,7 @@ async function generateCommandIndex () {
     if (!_.isArray(element[1])) {
       node.path = `${path}/${element[1]}`;
     } else {
+      node.path = `${path}/${element[1][0]}`;
       const name = element[1].shift();
       node.commands = [];
       for (let subElement of element[1]) {
@@ -159,15 +230,50 @@ async function generateCommandIndex () {
   //   {commands: [{name: '', path: ''}, {name: '', commands: [...]}]}
   const toc = require(path.resolve(__dirname, '..', 'docs', 'toc.js'));
   const commandToc = _.find(toc.en, (value) => value.indexOf('Commands') === 0);
-  let commands = [];
+  // const commands = commandToc[1].slice(1).map((el) => getTree(el, '/docs/en/commands'));
+  const commands = [];
   for (let el of commandToc[1].slice(1)) {
     commands.push(getTree(el, '/docs/en/commands'));
   }
 
-  const template = Handlebars.compile(await fs.readFile(path.resolve(__dirname, 'api-template.md'), 'utf8'), {noEscape: true, strict: true});
-  const markdown = template({commands});
-  await fs.writeFile(apiIndex, markdown, 'utf8');
-  console.log(`Done writing API index`);
+  const commandTemplate = Handlebars.compile(await fs.readFile(path.resolve(__dirname, 'api-template.md'), 'utf8'), {noEscape: true, strict: true});
+
+  async function writeIndex (index, commands, indexPath) {
+    log(`Creating API index '${index}'`);
+    const commandMarkdown = commandTemplate({
+      commands,
+      path: indexPath,
+    });
+    await fs.writeFile(index, commandMarkdown, 'utf8');
+  }
+
+  const apiIndex = path.resolve(__dirname, '..', 'docs', 'en', 'about-appium', 'api.md');
+  await writeIndex(apiIndex, commands);
+  log(`Done writing main API index`);
+
+  async function writeIndividualIndexes (command) {
+    if (!util.hasValue(command.commands)) {
+      // this is a leaf, so end
+      return;
+    }
+
+    // write this node
+    const relPath = command.path.startsWith(path.sep) ? command.path.substring(1) : command.path;
+    const index = path.resolve(__dirname, '..', relPath, 'README.md');
+    await writeIndex(index, command.commands, command.path);
+
+    // go through all the sub-commands
+    for (const el of command.commands) {
+      await writeIndividualIndexes(el);
+    }
+  }
+
+  // go through the full tree and generate readme files
+  const index = path.resolve(__dirname, '..', 'docs', 'en', 'commands', 'README.md');
+  await writeIndex(index, commands);
+  for (const el of commands) {
+    await writeIndividualIndexes(el);
+  }
 }
 
 async function main () {

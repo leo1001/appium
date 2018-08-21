@@ -24,7 +24,9 @@ driver.longPressKeyCode(10);
 
 
 
-// Not supported
+// wd example
+await driver.longPressKeyCode(10);
+
 ```
 
 ```ruby
@@ -64,13 +66,13 @@ driver.longPressKeyCode(10);
 
 |Language|Support|Documentation|
 |--------|-------|-------------|
-|[Java](https://github.com/appium/java-client/releases/latest)| All |  [appium.github.io](http://appium.github.io/java-client/io/appium/java_client/PressesKeyCode.html#longPressKeyCode-int-)  |
-|[Python](https://github.com/appium/python-client/releases/latest)| All |  [github.com](https://github.com/appium/python-client/blob/master/appium/webdriver/webdriver.py#L431)  |
-|[Javascript (WebdriverIO)](http://webdriver.io/index.html)| All |  [webdriver.io](http://webdriver.io/api/mobile/longPressKeycode.html)  |
-|[Javascript (WD)](https://github.com/admc/wd/releases/latest)| All |  |
-|[Ruby](https://github.com/appium/ruby_lib/releases/latest)| All |  [www.rubydoc.info](http://www.rubydoc.info/github/appium/ruby_lib_core/Appium/Core/Device#long_press_keycode-instance_method)  |
-|[PHP](https://github.com/appium/php-client/releases/latest)| All |  [github.com](https://github.com/appium/php-client/)  |
-|[C#](https://github.com/appium/appium-dotnet-driver/releases/latest)| All |  [github.com](https://github.com/appium/appium-dotnet-driver/)  |
+|[Java](https://github.com/appium/java-client/releases/latest)| All | [appium.github.io](https://appium.github.io/java-client/io/appium/java_client/windows/PressesKeyCode.html#longPressKeyCode-int-) |
+|[Python](https://github.com/appium/python-client/releases/latest)| All | [github.com](https://github.com/appium/python-client/blob/master/appium/webdriver/webdriver.py#L431) |
+|[Javascript (WebdriverIO)](http://webdriver.io/index.html)| All |  |
+|[Javascript (WD)](https://github.com/admc/wd/releases/latest)| All | [github.com](https://github.com/admc/wd/blob/master/lib/commands.js#L2478) |
+|[Ruby](https://github.com/appium/ruby_lib/releases/latest)| All | [www.rubydoc.info](https://www.rubydoc.info/github/appium/ruby_lib_core/Appium/Core/Device#long_press_keycode-instance_method) |
+|[PHP](https://github.com/appium/php-client/releases/latest)| All | [github.com](https://github.com/appium/php-client/) |
+|[C#](https://github.com/appium/appium-dotnet-driver/releases/latest)| All | [github.com](https://github.com/appium/appium-dotnet-driver/) |
 
 ## HTTP API Specifications
 
@@ -89,7 +91,8 @@ driver.longPressKeyCode(10);
 |name|type|description|
 |----|----|-----------|
 | keycode | `number` | Key code pressed on the device. See [Key Event](http://developer.android.com/reference/android/view/KeyEvent.html). |
-| metastate | `number` | Metastate for the keypress |
+| metastate | `number` | Metastate for the keypress. See [Key Event](http://developer.android.com/reference/android/view/KeyEvent.html). |
+| flags | `number` | Flags for the keypress. See [Key Event](http://developer.android.com/reference/android/view/KeyEvent.html). |
 
 ### Response
 
@@ -97,4 +100,4 @@ null
 
 ## See Also
 
-* [JSONWP Specification](https://github.com/appium/appium-base-driver/blob/master/lib/mjsonwp/routes.js#L331)
+* [JSONWP Specification](https://github.com/appium/appium-base-driver/blob/master/lib/protocol/routes.js#L360)

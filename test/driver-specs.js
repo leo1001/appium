@@ -147,8 +147,17 @@ describe('AppiumDriver', function () {
           someOtherParam: 'someOtherParam',
         };
 
+        let expectedW3cCaps = {
+          ...w3cCaps,
+          alwaysMatch: {
+            ...w3cCaps.alwaysMatch,
+            'appium:automationName': 'Fake',
+            'appium:someOtherParam': 'someOtherParam',
+          },
+        };
+
         mockFakeDriver.expects("createSession")
-          .once().withArgs(jsonwpCaps, undefined, null)
+          .once().withArgs(jsonwpCaps, undefined, expectedW3cCaps)
           .returns([SESSION_ID, jsonwpCaps]);
 
         await appium.createSession(jsonwpCaps, undefined, w3cCaps);
@@ -197,7 +206,7 @@ describe('AppiumDriver', function () {
       });
       it('should return an empty array of sessions', async function () {
         sessions = await appium.getSessions();
-        sessions.should.be.an.array;
+        sessions.should.be.an('array');
         sessions.should.be.empty;
       });
       it('should return sessions created', async function () {
@@ -205,7 +214,7 @@ describe('AppiumDriver', function () {
         let session2 = (await appium.createSession(_.extend(_.clone(BASE_CAPS), {cap: 'other value'}))).value;
 
         sessions = await appium.getSessions();
-        sessions.should.be.an.array;
+        sessions.should.be.an('array');
         sessions.should.have.length(2);
         sessions[0].id.should.equal(session1[0]);
         sessions[0].capabilities.should.eql(session1[1]);
@@ -264,11 +273,11 @@ describe('AppiumDriver', function () {
       });
     });
     describe('getDriverForCaps', function () {
-      it('should not blow up if user does not provide platformName', function () {
+      it('should not blow up if user does not provide platformName', async function () {
         let appium = new AppiumDriver({});
         (() => { appium.getDriverForCaps({}); }).should.throw(/platformName/);
       });
-      it('should get XCUITestDriver driver for automationName of XCUITest', function () {
+      it('should get XCUITestDriver driver for automationName of XCUITest', async function () {
         let appium = new AppiumDriver({});
         let driver = appium.getDriverForCaps({
           platformName: 'iOS',
@@ -277,7 +286,7 @@ describe('AppiumDriver', function () {
         driver.should.be.an.instanceof(Function);
         driver.should.equal(XCUITestDriver);
       });
-      it('should get iosdriver for ios < 10', function () {
+      it('should get iosdriver for ios < 10', async function () {
         let appium = new AppiumDriver({});
         let caps = {
           platformName: 'iOS',
@@ -307,7 +316,7 @@ describe('AppiumDriver', function () {
         driver = appium.getDriverForCaps(caps);
         driver.should.equal(IosDriver);
       });
-      it('should get xcuitestdriver for ios >= 10', function () {
+      it('should get xcuitestdriver for ios >= 10', async function () {
         let appium = new AppiumDriver({});
         let caps = {
           platformName: 'iOS',

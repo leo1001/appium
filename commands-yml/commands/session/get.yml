@@ -1,7 +1,7 @@
 ---
 name: Get Session Capabilities
 short_description: Retrieve the capabilities of the specified session
-   
+
 example_usage:
   java:
     |
@@ -11,8 +11,7 @@ example_usage:
       desired_caps = self.driver.desired_capabilities()
   javascript_wd:
     |
-      let caps = await driver.sessionCapabilities('c8db88a0-47a6-47a1-802d-164d746c06aa');
-
+      let caps = await driver.sessionCapabilities();
   javascript_wdio:
     |
       let caps = driver.session('c8db88a0-47a6-47a1-802d-164d746c06aa');
@@ -27,11 +26,11 @@ example_usage:
       // TODO C# sample
 
 client_docs:
-  java: "https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/server/DefaultDriverSessions.html#get-org.openqa.selenium.remote.SessionId-"
+  java: "https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/server/ActiveSessions.html#get-org.openqa.selenium.remote.SessionId-"
   python: "http://selenium-python.readthedocs.io/api.html#selenium.webdriver.remote.webdriver.WebDriver.desired_capabilities"
   javascript_wdio: "http://webdriver.io/api/protocol/session.html"
   javascript_wd: "https://github.com/admc/wd/blob/master/lib/commands.js#L227"
-  ruby: "http://www.rubydoc.info/gems/selenium-webdriver/Selenium%2FWebDriver%2FRemote%2FOSS%2FBridge:session_capabilities"
+  ruby: "https://www.rubydoc.info/gems/selenium-webdriver/Selenium%2FWebDriver%2FRemote%2FOSS%2FBridge:session_capabilities"
   php: "https://github.com/appium/php-client/" # TODO PHP documentation link
   csharp: "https://github.com/appium/appium-dotnet-driver/" # TODO Dotnet documentation link
 
@@ -55,7 +54,7 @@ client_support:
   csharp: true
   javascript_wd: true
   javascript_wdio: true
-  
+
 
 # Information about the HTTP endpoints
 endpoint:
@@ -69,5 +68,5 @@ endpoint:
       description: An object describing the session's capabilities
 
 # Links to specifications. Should link to at least one specification
-specifications: 
+specifications:
   jsonwp: https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol#sessionsessionid

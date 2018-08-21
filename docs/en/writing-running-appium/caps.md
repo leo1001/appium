@@ -60,10 +60,10 @@ These Capabilities are available only on Android-based drivers (like
 
 |Capability|Description|Values|
 |----|-----------|-------|
-|`appActivity`| Activity name for the Android activity you want to launch from your package. This often needs to be preceded by a `.` (e.g., `.MainActivity` instead of `MainActivity`)|`MainActivity`, `.Settings`|
-|`appPackage`| Java package of the Android app you want to run|`com.example.android.myApp`, `com.android.settings`|
-|`appWaitActivity`| Activity name/names, comma separated, for the Android activity you want to wait for|`SplashActivity`, `SplashActivity,OtherActivity`, `*`, `*.SplashActivity`|
-|`appWaitPackage`| Java package of the Android app you want to wait for|`com.example.android.myApp`, `com.android.settings`|
+|`appActivity`| Activity name for the Android activity you want to launch from your package. This often needs to be preceded by a `.` (e.g., `.MainActivity` instead of `MainActivity`). By default this capability is received from the package manifest (action: android.intent.action.MAIN , category: android.intent.category.LAUNCHER) |`MainActivity`, `.Settings`|
+|`appPackage`| Java package of the Android app you want to run. By default this capability is received from the package manifest (@package attribute value)|`com.example.android.myApp`, `com.android.settings`|
+|`appWaitActivity`| Activity name/names, comma separated, for the Android activity you want to wait for. By default the value of this capability is the same as for `appActivity`. You must set it to the very first focused application activity name in case it is different from the one which is set as `appActivity` if your capability has `appActivity` and `appPackage`. |`SplashActivity`, `SplashActivity,OtherActivity`, `*`, `*.SplashActivity`|
+|`appWaitPackage`| Java package of the Android app you want to wait for. By default the value of this capability is the same as for `appActivity` |`com.example.android.myApp`, `com.android.settings`|
 |`appWaitDuration`| Timeout in milliseconds used to wait for the appWaitActivity to launch (default `20000`)| `30000`|
 |`deviceReadyTimeout`| Timeout in seconds while waiting for device to become ready|`5`|
 |`androidCoverage`| Fully qualified instrumentation class. Passed to -w in adb shell am instrument -e coverage true -w | `com.my.Pkg/com.my.Pkg.instrumentation.MyInstrumentation`|
@@ -85,8 +85,9 @@ These Capabilities are available only on Android-based drivers (like
 |`keyAlias`| Alias for key |e.g., `androiddebugkey`|
 |`keyPassword`| Password for key |e.g., `foo`|
 |`chromedriverExecutable`| The absolute local path to webdriver executable (if Chromium embedder provides its own webdriver, it should be used instead of original chromedriver bundled with Appium) |`/abs/path/to/webdriver`|
-|`chromedriverExecutableDir`| The absolute path to a directory to look for Chromedriver executables in, for automatic discovery of compatible Chromedrivers |`/abs/path/to/chromedriver/directory`|
-|`chromedriverChromeMappingFile`| The absolute path to a file which maps Chromedriver versions to the minimum Chrome that it supports |`/abs/path/to/mapping.json`|
+|`chromedriverExecutableDir`| The absolute path to a directory to look for Chromedriver executables in, for automatic discovery of compatible Chromedrivers. Ignored if `chromedriverUseSystemExecutable` is `true` |`/abs/path/to/chromedriver/directory`|
+|`chromedriverChromeMappingFile` | The absolute path to a file which maps Chromedriver versions to the minimum Chrome that it supports. Ignored if `chromedriverUseSystemExecutable` is `true`|`/abs/path/to/mapping.json`|
+|`chromedriverUseSystemExecutable`| If `true`, bypasses automatic Chromedriver configuration and uses the version that comes downloaded with Appium. Ignored if `chromedriverExecutable` is set. Defaults to `false` |e.g., `true`|
 |`autoWebviewTimeout`| Amount of time to wait for Webview context to become active, in ms. Defaults to `2000`| e.g. `4`|
 |`intentAction`| Intent action which will be used to start activity (default `android.intent.action.MAIN`)| e.g.`android.intent.action.MAIN`, `android.intent.action.VIEW`|
 |`intentCategory`| Intent category which will be used to start activity (default `android.intent.category.LAUNCHER`)| e.g. `android.intent.category.LAUNCHER`, `android.intent.category.APP_CONTACTS`
@@ -102,7 +103,7 @@ These Capabilities are available only on Android-based drivers (like
 |`recreateChromeDriverSessions`| Kill ChromeDriver session when moving to a non-ChromeDriver webview. Defaults to `false` | `true` or `false`|
 |`nativeWebScreenshot`| In a web context, use native (adb) method for taking a screenshot, rather than proxying to ChromeDriver. Defaults to `false` | `true` or `false`|
 |`androidScreenshotPath`| The name of the directory on the device in which the screenshot will be put. Defaults to `/data/local/tmp` |e.g. `/sdcard/screenshots/`|
-|`autoGrantPermissions`|Have Appium automatically determine which permissions your app requires and grant them to the app on install. Defaults to `false`|`true` or `false`|
+|`autoGrantPermissions`|Have Appium automatically determine which permissions your app requires and grant them to the app on install. Defaults to `false`. If `noReset` is `true`, this capability doesn't work. |`true` or `false`|
 |`networkSpeed`|Set the network speed emulation. Specify the maximum network upload and download speeds. Defaults to `full`| `['full','gsm', 'edge', 'hscsd', 'gprs', 'umts', 'hsdpa', 'lte', 'evdo']` Check [-netspeed option](https://developer.android.com/studio/run/emulator-commandline.html) more info about speed emulation for avds|
 |`gpsEnabled`|Toggle gps location provider for emulators before starting the session. By default the emulator will have this option enabled or not according to how it has been provisioned.|`true` or `false`|
 |`isHeadless`|Set this capability to `true` to run the Emulator headless when device display is not needed to be visible. `false` is the default value. _isHeadless_ is also support for iOS, check XCUITest-specific capabilities. |e.g., `true`|
@@ -144,6 +145,7 @@ Driver](/docs/en/drivers/ios-uiautomation.md).
 |`appName`| The display name of the application under test. Used to automate backgrounding the app in iOS 9+.|e.g., `UICatalog`|
 |`customSSLCert`|(Sim only) Add an SSL certificate to IOS Simulator. | e.g. <br/>`-----BEGIN CERTIFICATE-----MIIFWjCCBEKg...`<br/>`-----END CERTIFICATE-----`|
 |`webkitResponseTimeout`|(Real device only) Set the time, in ms, to wait for a response from WebKit in a Safari session. Defaults to `5000`|e.g., `10000`|
+|`remoteDebugProxy`| (Sim only, <= 11.2) If set, Appium sends and receives remote debugging messages through a proxy on either the local port (Sim only, <= 11.2) or a proxy on this unix socket (Sim only >= 11.3) instead of communicating with the iOS remote debugger directly. |e.g. `12000` or `"/tmp/my.proxy.socket"`|
 
 ### iOS Only, using XCUITest
 
